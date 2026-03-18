@@ -1304,7 +1304,7 @@
                     <div class="gift-info">
                         <p class="gift-name">${safeNama}</p>
                         <p class="gift-price">${escapeHtml(String(g.harga || ''))}</p>
-                        <button class="btn-claim" onclick="claimGift(${g.id}, '${safeNama.replace(/'/g, "\\'")}')">Klaim Hadiah</button>
+                        <button class="btn-claim" onclick="claimGift(${g.id}, '${safeNama.replace(/'/g, "\\'")}')">Berikan Hadiah</button>
                         <p class="claimed-badge">Sudah diklaim${g.diklaim_oleh ? ' oleh ' + escapeHtml(g.diklaim_oleh) : ''}</p>
                     </div>
                 </div>
