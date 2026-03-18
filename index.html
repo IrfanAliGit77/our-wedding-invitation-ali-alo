@@ -324,7 +324,7 @@
         .video-section .section-label { color: var(--sage-light); }
         .video-section .section-title { color: var(--cream); }
         .video-wrapper {
-            position: relative; width: 100%; max-width: 640px;
+            position: relative; width: 100%; max-width: 360px;
             margin: 2rem auto 0; aspect-ratio: 9/16;
             background: #000; overflow: hidden;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
@@ -877,7 +877,11 @@
             <div class="divider" style="background:rgba(255,255,255,0.3);" data-aos="fade-up" data-aos-delay="150"></div>
             <!-- GANTI: link YouTube video prewed/journey -->
             <div class="video-wrapper" data-aos="zoom-in" data-aos-delay="200">
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/4VscQXeUUVs?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/4VscQXeUUVs?rel=0" 
+                    title="Our Journey Video" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen loading="lazy">
+                </iframe>
             </div>
         </div>
     </section>
