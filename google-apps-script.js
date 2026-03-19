@@ -50,18 +50,19 @@ function doGet(e) {
       }
 
       case 'gifts': {
-        const sheet = ss.getSheetByName('gifts');
-        if (!sheet) return createJsonResponse({ gifts: [] });
-        const [headers, ...rows] = sheet.getDataRange().getValues();
-        const gifts = rows.map(row => ({
-          id: row[0],
-          nama: row[1],
-          gambar: row[2],
-          harga: row[3],
-          status: row[4] || 'available',
-          diklaim_oleh: row[5] || ''
-        }));
-        return createJsonResponse({ gifts });
+          const sheet = ss.getSheetByName('gifts');
+          if (!sheet) return createJsonResponse({ gifts: [] });
+          const [headers, ...rows] = sheet.getDataRange().getValues();
+          const gifts = rows.filter(row => row[0]).map(row => ({
+              id: row[0],
+              nama: row[1],
+              gambar: row[2],
+              harga: row[3],
+              status: row[4] || 'available',
+              diklaim_oleh: row[5] || '',
+              link: row[7] || ''
+          }));
+          return createJsonResponse({ gifts });
       }
 
       case 'playlist': {
