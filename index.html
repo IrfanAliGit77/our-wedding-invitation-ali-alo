@@ -73,11 +73,44 @@
             position: fixed; inset: 0; z-index: 9999;
             background: linear-gradient(160deg, var(--sage-dark) 0%, var(--sage) 50%, var(--sage-light) 100%);
             display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            overflow: hidden;
+            transition: opacity 1s ease, transform 1.2s ease;
         }
-        #cover.opened { opacity: 0; transform: scale(1.1); pointer-events: none; }
+        #cover.opened { opacity: 0; transform: scale(1.06); pointer-events: none; }
+        /* Foto latar — path diatur lewat --cover-img di elemen #cover */
+        .cover-bg {
+            position: absolute; inset: 0;
+            background-image: var(--cover-img);
+            background-size: cover;
+            background-position: var(--cover-pos, center);
+            transform: scale(1.12);
+            animation: coverZoom 18s ease-out forwards;
+        }
+        @keyframes coverZoom { to { transform: scale(1); } }
+        /* Lapisan gelap supaya tulisan tetap terbaca di atas foto */
+        #cover::before {
+            content: ''; position: absolute; inset: 0; z-index: 1;
+            background:
+                radial-gradient(ellipse at center, rgba(28,31,25,0.25) 0%, rgba(28,31,25,0.6) 75%),
+                linear-gradient(180deg, rgba(28,31,25,0.25) 0%, rgba(28,31,25,0.45) 55%, rgba(28,31,25,0.85) 100%);
+        }
+        /* Bingkai tipis ganda */
+        #cover::after {
+            content: ''; position: absolute; inset: 16px; z-index: 1;
+            border: 1px solid rgba(240,232,219,0.35);
+            outline: 1px solid rgba(240,232,219,0.18); outline-offset: -7px;
+            pointer-events: none;
+        }
         .cover-inner {
+            position: relative; z-index: 2;
             text-align: center; color: var(--cream); padding: 2rem;
+            text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+            animation: coverIn 1.6s ease both 0.2s;
+        }
+        @keyframes coverIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+        .cover-date {
+            font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.4em;
+            margin-top: 1rem; opacity: 0.85;
         }
         .cover-inner .bismillah {
             font-family: var(--font-arabic); font-size: 2rem; margin-bottom: 1rem;
@@ -89,7 +122,7 @@
             font-weight: 300; margin-bottom: 0.5rem;
         }
         .cover-inner .couple-name {
-            font-family: var(--font-display); font-size: 3rem;
+            font-family: var(--font-display); font-size: 3.8rem;
             font-weight: 300; font-style: italic; line-height: 1.2;
             margin-bottom: 0.5rem;
         }
@@ -108,12 +141,13 @@
         .btn-open {
             margin-top: 2.5rem; padding: 0.85rem 2.5rem;
             background: transparent; border: 1.5px solid rgba(255,255,255,0.6);
-            color: var(--cream); font-family: var(--font-body); font-size: 0.85rem;
-            letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer;
+            color: var(--cream); font-family: var(--font-body); font-size: 0.78rem;
+            letter-spacing: 0.3em; text-transform: uppercase; cursor: pointer;
             transition: all 0.4s ease; border-radius: 0;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         }
         .btn-open:hover {
-            background: rgba(255,255,255,0.15); border-color: var(--cream);
+            background: var(--gold); border-color: var(--gold); color: var(--white);
         }
         .envelope-icon { 
             width: 32px; height: 32px; margin-bottom: 1.5rem; 
@@ -430,37 +464,98 @@
 
         /* ============ VIDEO ============ */
         .video-section {
-            background: var(--charcoal); color: var(--cream);
+            position: relative;
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(139,157,119,0.22) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 100%, rgba(201,169,110,0.12) 0%, transparent 50%),
+                linear-gradient(180deg, #31342e 0%, #282a25 100%);
+            color: var(--cream);
             text-align: center;
+            padding-top: 6rem; padding-bottom: 6rem;
         }
-        .video-section .section-label { color: var(--sage-light); }
+        .video-section .section-inner { position: relative; z-index: 1; }
+        .video-section .section-label { color: var(--gold-light); }
         .video-section .section-title { color: var(--cream); }
+        /* Tulisan besar samar di belakang */
+        .video-watermark {
+            position: absolute; left: 50%; top: 3.2rem; transform: translateX(-50%);
+            font-family: var(--font-display); font-style: italic; font-weight: 300;
+            font-size: clamp(5rem, 20vw, 13rem); line-height: 1; white-space: nowrap;
+            color: rgba(240,232,219,0.04); pointer-events: none; user-select: none;
+        }
+        /* Ranting dekorasi di pojok */
+        .v-sprig {
+            position: absolute; width: clamp(110px, 22vw, 220px); height: auto;
+            color: var(--gold); opacity: 0.35; pointer-events: none;
+        }
+        .v-sprig.tl { top: 1.2rem; left: 0.6rem; }
+        .v-sprig.br { bottom: 1.2rem; right: 0.6rem; transform: rotate(180deg); }
+        .video-quote {
+            font-family: var(--font-display); font-style: italic; font-weight: 300;
+            font-size: 1.15rem; line-height: 1.8; color: rgba(240,232,219,0.8);
+            max-width: 460px; margin: -0.5rem auto 0;
+        }
         .video-list {
             display: flex; flex-direction: column; align-items: center;
-            gap: 2.5rem; margin-top: 2rem;
+            gap: 4rem; margin-top: 3rem;
         }
-        .video-item { width: 100%; }
-        .video-caption {
-            font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
-            color: var(--sage-light); margin-top: 0.9rem;
+        .video-item { width: 100%; margin: 0; }
+        /* Bingkai emas di sekeliling video */
+        .video-frame {
+            position: relative; width: 100%; max-width: 760px; margin: 0 auto;
+            padding: 12px;
+            border: 1px solid rgba(201,169,110,0.45);
         }
+        .video-frame.featured {
+            max-width: none;
+            width: min(1020px, calc(100vw - 1rem));
+            margin-left: 50%; transform: translateX(-50%);
+        }
+        .vf-corner {
+            position: absolute; width: 26px; height: 26px; pointer-events: none;
+            border-color: var(--gold); border-style: solid; border-width: 0;
+        }
+        .vf-corner::after {
+            content: ''; position: absolute; width: 7px; height: 7px;
+            background: var(--gold); transform: rotate(45deg);
+        }
+        .vf-corner.tl { top: -6px; left: -6px; border-top-width: 2px; border-left-width: 2px; }
+        .vf-corner.tr { top: -6px; right: -6px; border-top-width: 2px; border-right-width: 2px; }
+        .vf-corner.bl { bottom: -6px; left: -6px; border-bottom-width: 2px; border-left-width: 2px; }
+        .vf-corner.br { bottom: -6px; right: -6px; border-bottom-width: 2px; border-right-width: 2px; }
+        .vf-corner.tl::after { top: -5px; left: -5px; }
+        .vf-corner.tr::after { top: -5px; right: -5px; }
+        .vf-corner.bl::after { bottom: -5px; left: -5px; }
+        .vf-corner.br::after { bottom: -5px; right: -5px; }
         .video-wrapper {
             position: relative; width: 100%;
             margin: 0 auto;
             background: #000; overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.45);
         }
-        .video-wrapper.landscape { max-width: 720px; aspect-ratio: 16/9; }
-        /* Video pertama: lebih besar, keluar dari lebar konten biasa */
-        .video-wrapper.featured {
-            max-width: none;
-            width: min(1000px, calc(100vw - 1rem));
-            margin-left: 50%; transform: translateX(-50%);
-        }
+        .video-wrapper.landscape { aspect-ratio: 16/9; }
         .video-wrapper.portrait { max-width: 240px; aspect-ratio: 9/16; }
         .video-wrapper iframe {
             position: absolute; inset: 0; width: 100%; height: 100%;
             border: none;
+        }
+        .video-caption { margin-top: 1.6rem; }
+        .vc-kicker {
+            display: block; font-size: 0.65rem; letter-spacing: 0.4em;
+            text-transform: uppercase; color: var(--gold-light);
+        }
+        .vc-title {
+            display: block; font-family: var(--font-display); font-style: italic;
+            font-weight: 300; font-size: clamp(1.4rem, 4vw, 1.9rem);
+            color: var(--cream); margin-top: 0.3rem; line-height: 1.3;
+        }
+        .vc-meta {
+            display: block; font-size: 0.78rem; letter-spacing: 0.15em;
+            color: rgba(240,232,219,0.55); margin-top: 0.35rem;
+        }
+        .video-note {
+            font-size: 0.7rem; letter-spacing: 0.15em; color: rgba(240,232,219,0.45);
+            margin-top: 3.5rem;
         }
 
         /* ============ VENUE ============ */
@@ -805,22 +900,176 @@
             .mempelai-ampersand { font-size: 3rem; }
             section { padding: 4rem 1.2rem; }
         }
+
+        /* =========================================================
+           ELEGANT THEME LAYER — penyempurnaan tampilan keseluruhan
+           ========================================================= */
+        body { -webkit-font-smoothing: antialiased; }
+        section { padding-top: 6rem; padding-bottom: 6rem; }
+
+        .section-label {
+            display: flex; align-items: center; justify-content: center; gap: 0.9rem;
+            font-size: 0.66rem; letter-spacing: 0.45em; text-align: center;
+        }
+        .section-label::before, .section-label::after {
+            content: ''; flex: 0 0 26px; height: 1px; background: currentColor; opacity: 0.5;
+        }
+        .section-title {
+            font-style: italic; font-weight: 300;
+            font-size: clamp(2.3rem, 6vw, 3.2rem); margin-bottom: 1.1rem;
+        }
+        /* Garis pembatas jadi ornamen */
+        .divider {
+            width: 170px; height: 22px; opacity: 1; margin-bottom: 2.6rem;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 22'%3E%3Cg fill='none' stroke='%23C9A96E' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M2 11H64M106 11H168'/%3E%3Cpath d='M85 3l8 8-8 8-8-8z'/%3E%3Cpath d='M85 7l4 4-4 4-4-4z' fill='%23C9A96E'/%3E%3Cpath d='M64 11c4-5 9-6 12-6M64 11c4 5 9 6 12 6M106 11c-4-5-9-6-12-6M106 11c-4 5-9 6-12 6'/%3E%3C/g%3E%3Ccircle cx='58' cy='11' r='1.4' fill='%23C9A96E'/%3E%3Ccircle cx='112' cy='11' r='1.4' fill='%23C9A96E'/%3E%3C/svg%3E") center / contain no-repeat !important;
+        }
+        .quran-section .divider, .countdown-section .divider, .video-section .divider,
+        .rsvp-section .divider, .playlist-section .divider {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 22'%3E%3Cg fill='none' stroke='%23F0E8DB' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M2 11H64M106 11H168'/%3E%3Cpath d='M85 3l8 8-8 8-8-8z'/%3E%3Cpath d='M85 7l4 4-4 4-4-4z' fill='%23F0E8DB'/%3E%3Cpath d='M64 11c4-5 9-6 12-6M64 11c4 5 9 6 12 6M106 11c-4-5-9-6-12-6M106 11c-4 5-9 6-12 6'/%3E%3C/g%3E%3Ccircle cx='58' cy='11' r='1.4' fill='%23F0E8DB'/%3E%3Ccircle cx='112' cy='11' r='1.4' fill='%23F0E8DB'/%3E%3C/svg%3E") !important; opacity: 0.85;
+        }
+
+        /* Latar krem dengan semburat lembut */
+        .mempelai-section, .journey-section, .venue-section, .wishes-section {
+            background:
+                radial-gradient(circle at 12% 0%, rgba(201,169,110,0.10), transparent 38%),
+                radial-gradient(circle at 88% 100%, rgba(139,157,119,0.10), transparent 42%),
+                var(--cream);
+        }
+        .gallery-section, .gift-section {
+            background:
+                radial-gradient(circle at 50% 0%, rgba(240,232,219,0.7), transparent 55%),
+                var(--white);
+        }
+
+        /* Ayat — bingkai ganda */
+        .quran-section .section-inner {
+            position: relative; padding: 3.5rem 1.8rem;
+            border: 1px solid rgba(240,232,219,0.3);
+        }
+        .quran-section .section-inner::before {
+            content: ''; position: absolute; inset: 7px;
+            border: 1px solid rgba(240,232,219,0.15); pointer-events: none;
+        }
+
+        /* Mempelai — foto bentuk lengkung (arch) */
+        .mempelai-photo {
+            width: 240px; height: 320px; border: none;
+            border-radius: 999px 999px 4px 4px;
+            outline: 1px solid var(--gold); outline-offset: 9px;
+            margin-bottom: 2.2rem;
+            box-shadow: 0 22px 45px rgba(58,58,58,0.14);
+        }
+        .mempelai-name { font-size: 2.4rem; font-weight: 300; }
+        .mempelai-fullname { letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.75rem; margin-top: 0.4rem; }
+        .mempelai-ampersand { font-style: italic; font-size: 4.5rem; }
+
+        /* Countdown — kotak lengkung tipis */
+        .countdown-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(240,232,219,0.4);
+            border-radius: 999px 999px 0 0;
+            padding: 2rem 1rem 1.3rem; min-width: 92px;
+            backdrop-filter: none;
+        }
+        .countdown-number { font-style: italic; }
+        .save-date-btn { letter-spacing: 0.28em; font-size: 0.72rem; padding: 0.85rem 2.2rem; }
+        .save-date-btn:hover { background: var(--gold); border-color: var(--gold); }
+
+        /* Kartu dengan bingkai dalam emas */
+        .timeline-content, .venue-card, .rekening-card {
+            position: relative; border: none;
+            box-shadow: 0 10px 35px rgba(58,58,58,0.06);
+        }
+        .timeline-content::before, .venue-card::before, .rekening-card::before {
+            content: ''; position: absolute; inset: 7px;
+            border: 1px solid rgba(201,169,110,0.35); pointer-events: none;
+        }
+        .timeline-content { padding: 1.8rem; }
+        .timeline-title { font-style: italic; font-size: 1.45rem; font-weight: 400; }
+        .timeline-dot { width: 11px; height: 11px; border-radius: 0; transform: translateX(-50%) rotate(45deg); }
+        .venue-card { padding: 3rem 2.2rem; margin-top: 2rem; }
+        .venue-name { font-style: italic; font-weight: 400; font-size: 1.75rem; }
+        .rekening-card { padding: 2rem; background: var(--cream); }
+        .account-number { letter-spacing: 0.12em; }
+        .maps-wrapper { border: 1px solid rgba(201,169,110,0.4); padding: 8px; height: 270px; background: var(--white); }
+
+        /* Tombol */
+        .btn-maps, .btn-wish, .btn-claim, .btn-copy {
+            letter-spacing: 0.24em; font-size: 0.7rem; transition: all 0.4s ease;
+        }
+        .btn-maps, .btn-wish { padding: 0.9rem 2.3rem; }
+        .btn-maps:hover, .btn-wish:hover, .btn-claim:hover { background: var(--gold); }
+        .btn-submit, .btn-playlist { letter-spacing: 0.24em; font-size: 0.75rem; padding: 1rem; }
+
+        /* Ucapan */
+        .wish-item { border: none; border-left: 2px solid var(--gold-light); box-shadow: 0 6px 20px rgba(58,58,58,0.04); padding: 1.3rem 1.5rem; }
+        .wish-author { font-style: italic; font-weight: 500; }
+        .gift-subtitle { font-style: italic; }
+
+        /* Footer */
+        footer { padding: 4.5rem 2rem 6rem; background: linear-gradient(180deg, var(--sage-dark), #59684b); }
+        footer::before {
+            content: ''; display: block; width: 170px; height: 22px; margin: 0 auto 1.6rem;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 22'%3E%3Cg fill='none' stroke='%23F0E8DB' stroke-width='1' stroke-linecap='round'%3E%3Cpath d='M2 11H64M106 11H168'/%3E%3Cpath d='M85 3l8 8-8 8-8-8z'/%3E%3Cpath d='M85 7l4 4-4 4-4-4z' fill='%23F0E8DB'/%3E%3Cpath d='M64 11c4-5 9-6 12-6M64 11c4 5 9 6 12 6M106 11c-4-5-9-6-12-6M106 11c-4 5-9 6-12 6'/%3E%3C/g%3E%3Ccircle cx='58' cy='11' r='1.4' fill='%23F0E8DB'/%3E%3Ccircle cx='112' cy='11' r='1.4' fill='%23F0E8DB'/%3E%3C/svg%3E") center / contain no-repeat; opacity: 0.8;
+        }
+        .footer-names { font-size: 2.8rem; }
+
+        /* Navigasi bawah */
+        .nav-bottom { background: rgba(40,42,37,0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .music-btn { background: var(--gold); box-shadow: 0 6px 22px rgba(201,169,110,0.45); bottom: 5rem; }
+
+        @media (max-width: 640px) {
+            section { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+            .cover-inner .couple-name { font-size: 2.9rem; }
+            .mempelai-photo { width: 200px; height: 266px; }
+            .quran-section .section-inner { padding: 2.5rem 1.2rem; }
+            .countdown-item { min-width: 70px; padding: 1.5rem 0.6rem 1rem; }
+            .video-section { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+            .video-frame { padding: 8px; }
+            .video-list { gap: 3.2rem; }
+            /* Timeline satu kolom di HP */
+            .timeline::before { left: 10px; }
+            .timeline-item, .timeline-item:nth-child(even) { flex-direction: row; }
+            .timeline-content { width: calc(100% - 2.2rem); margin-left: 2.2rem; padding: 1.5rem 1.4rem; }
+            .timeline-dot { left: 10px; }
+        }
     </style>
 </head>
 <body class="no-scroll">
+    <!-- Ornamen ranting (dipakai ulang di beberapa bagian) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="sprig" viewBox="0 0 200 200">
+            <g fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 192C52 158 104 112 192 14"/>
+                <path d="M40 168c-2-14 4-28 16-34c2 14-4 28-16 34z"/>
+                <path d="M46 162c12-6 28-4 36 6c-12 6-28 4-36-6z"/>
+                <path d="M78 136c-2-14 4-28 16-34c2 14-4 28-16 34z"/>
+                <path d="M84 130c12-6 28-4 36 6c-12 6-28 4-36-6z"/>
+                <path d="M114 102c-1-13 5-26 16-31c1 13-5 26-16 31z"/>
+                <path d="M120 96c11-5 26-3 33 6c-11 5-26 3-33-6z"/>
+                <path d="M146 68c-1-11 4-22 13-27c1 11-4 22-13 27z"/>
+                <path d="M152 62c9-4 21-2 27 5c-9 4-21 2-27-5z"/>
+                <circle cx="24" cy="186" r="2"/><circle cx="62" cy="152" r="1.5"/><circle cx="172" cy="40" r="1.6"/>
+            </g>
+        </symbol>
+    </svg>
     <!-- ============ AUDIO ============ -->
     <audio id="bg-music" loop preload="auto">
         <source src="assets/music/sound-final.mp3" type="audio/mpeg">
     </audio>
 
     <!-- ============ COVER ============ -->
-    <div id="cover">
+    <!-- GANTI FOTO COVER: ubah path di --cover-img (pakai tanda kutip karena nama file ada spasinya).
+         --cover-pos = bagian foto yang difokuskan, misal: center 30% (lebih ke atas), center bottom, dll. -->
+    <div id="cover" style="--cover-img: url('assets/images/halaman-awal.jpg'); --cover-pos: center 35%;">
+        <div class="cover-bg"></div>
         <div class="cover-inner">
             <i data-lucide="mail" class="envelope-icon"></i>
             <p class="the-wedding">The Wedding Of</p>
             <p class="couple-name">Ali</p>
             <span class="ampersand">&amp;</span>
             <p class="couple-name">Alo</p>
+            <p class="cover-date">25 &middot; 12 &middot; 2026</p>
             <p class="guest-label">Kepada Yth.</p>
             <p class="guest-name" id="guest-display">Tamu Undangan</p>
             <button class="btn-open" onclick="openInvitation()">
@@ -882,7 +1131,7 @@
                 <div class="mempelai-card" data-aos="fade-right" data-aos-delay="200">
                     <!-- GANTI: foto mempelai pria -->
                     <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-341.jpg" alt="Mempelai Pria">
-                    <p class="mempelai-name">IRFAN</p>
+                    <p class="mempelai-name">Irfan</p>
                     <p class="mempelai-fullname">Muh. Irfan Ali</p>
                     <p class="mempelai-parent">Putra dari<br>Bapak Tekat</p>
                 </div>
@@ -890,7 +1139,7 @@
                 <div class="mempelai-card" data-aos="fade-left" data-aos-delay="200">
                     <!-- GANTI: foto mempelai wanita -->
                     <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-362 - Copy.jpg" alt="Mempelai Wanita">
-                    <p class="mempelai-name">ALODIA</p>                   
+                    <p class="mempelai-name">Alodia</p>                   
                     <p class="mempelai-fullname">Alodia Kinanti Faruqa</p>
                     <p class="mempelai-parent">Putri dari<br>Bapak Imam Rohani</p>
                 </div>
@@ -983,7 +1232,7 @@
     <!-- ============ 5. GALLERY ============ -->
     <section class="gallery-section" id="gallery">
         <div class="section-inner">
-            <p class="section-label" data-aos="fade-up">Engagement</p>
+            <p class="section-label" data-aos="fade-up">Spark of Love</p>
             <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Gallery</h2>
             <div class="divider" data-aos="fade-up" data-aos-delay="150"></div>
             <!-- Daftar foto diatur di GALLERY_PHOTOS (bagian script di bawah) -->
@@ -1006,43 +1255,54 @@
 
     <!-- ============ 6. VIDEO ============ -->
     <section class="video-section" id="video">
+        <svg class="v-sprig tl" viewBox="0 0 200 200" aria-hidden="true"><use href="#sprig"/></svg>
+        <svg class="v-sprig br" viewBox="0 0 200 200" aria-hidden="true"><use href="#sprig"/></svg>
+        <p class="video-watermark" aria-hidden="true">Ali &amp; Alo</p>
         <div class="section-inner">
             <p class="section-label" data-aos="fade-up">Our Moments</p>
             <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Video</h2>
-            <div class="divider" style="background:rgba(255,255,255,0.3);" data-aos="fade-up" data-aos-delay="150"></div>
-            <!-- GANTI: link YouTube video -->
+            <div class="divider" data-aos="fade-up" data-aos-delay="150"></div>
+            <!-- GANTI: kutipan pendek di atas video (boleh dihapus) -->
+            <p class="video-quote" data-aos="fade-up" data-aos-delay="200">&ldquo;Sepotong cerita dari hari kami berjanji, untuk dikenang bersama orang-orang tersayang.&rdquo;</p>
+            <!-- GANTI: link YouTube video (biarkan &enablejsapi=1 supaya musik bisa otomatis berhenti) -->
             <div class="video-list">
-                <div class="video-item" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="video-wrapper landscape featured">
-                        <iframe src="https://www.youtube.com/embed/_bTzxku3Gm0?rel=0"
-                            title="Sneakpeek Engagement Alodia & Irfan"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen loading="lazy">
-                        </iframe>
+                <figure class="video-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="video-frame featured">
+                        <span class="vf-corner tl"></span><span class="vf-corner tr"></span><span class="vf-corner bl"></span><span class="vf-corner br"></span>
+                        <div class="video-wrapper landscape">
+                            <iframe src="https://www.youtube.com/embed/_bTzxku3Gm0?rel=0&enablejsapi=1"
+                                title="Anantya Alira Asmara Kinanloka — Engagement Irfan &amp; Alodia"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen loading="lazy">
+                            </iframe>
+                        </div>
                     </div>
-                </div>
-                <div class="video-item" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="video-wrapper landscape">
-                        <iframe src="https://www.youtube.com/embed/ENNRYtpBbM8?rel=0"
-                            title="Engagement Irfan & Alodia — Kediri, 6 September 2026"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen loading="lazy">
-                        </iframe>
+                    <figcaption class="video-caption">
+                        <span class="vc-kicker">The Engagement Film</span>
+                        <span class="vc-title">Anantya Alira Asmara Kinanloka</span>
+                        <span class="vc-meta">Kediri &middot; 6 September 2026</span>
+                    </figcaption>
+                </figure>
+                <figure class="video-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="video-frame">
+                        <span class="vf-corner tl"></span><span class="vf-corner tr"></span><span class="vf-corner bl"></span><span class="vf-corner br"></span>
+                        <div class="video-wrapper landscape">
+                            <iframe src="https://www.youtube.com/embed/ENNRYtpBbM8?rel=0&enablejsapi=1"
+                                title="Sneakpeek Engagement Alodia &amp; Irfan"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen loading="lazy">
+                            </iframe>
+                        </div>
                     </div>
-                </div>
-                <!-- <div class="video-item" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="video-wrapper portrait">
-                        <iframe src="https://www.youtube.com/embed/4VscQXeUUVs?rel=0"
-                            title="Our Journey Video"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen loading="lazy">
-                        </iframe>
-                    </div>
-                </div> -->
+                    <figcaption class="video-caption">
+                        <span class="vc-kicker">Sneakpeek</span>
+                        <span class="vc-title">Engagement Alodia &amp; Irfan</span>
+                    </figcaption>
+                </figure>
             </div>
+            <p class="video-note">Musik latar berhenti otomatis saat video diputar</p>
         </div>
     </section>
 
@@ -1315,22 +1575,101 @@
         document.body.classList.remove('no-scroll');
         document.getElementById('music-btn').classList.add('visible');
         document.getElementById('nav-bottom').classList.add('visible');
+        playMusic();
+        setTimeout(() => { document.getElementById('cover').style.display = 'none'; }, 900);
+    }
+    
+    function playMusic() {
         audio.play().then(() => {
             musicPlaying = true;
             document.getElementById('music-btn').classList.add('playing');
         }).catch(() => {});
-        setTimeout(() => { document.getElementById('cover').style.display = 'none'; }, 900);
     }
-    
+
+    function pauseMusic() {
+        audio.pause(); musicPlaying = false;
+        document.getElementById('music-btn').classList.remove('playing');
+    }
+
     function toggleMusic() {
-        if (musicPlaying) {
-            audio.pause(); musicPlaying = false;
-            document.getElementById('music-btn').classList.remove('playing');
-        } else {
-            audio.play(); musicPlaying = true;
-            document.getElementById('music-btn').classList.add('playing');
+        musicPausedByVideo = false; // tamu pegang kendali sendiri
+        if (musicPlaying) pauseMusic(); else playMusic();
+    }
+
+    // ===========================
+    // MUSIK OTOMATIS BERHENTI SAAT VIDEO YOUTUBE DIPUTAR
+    // ===========================
+    let musicPausedByVideo = false;
+    const ytPlayers = [];
+
+    let ytApiReady = false;
+
+    function initYouTubePlayers() {
+        if (ytApiReady || !(window.YT && YT.Player)) return;
+        ytApiReady = true;
+        document.querySelectorAll('.video-wrapper iframe').forEach(frame => {
+            ytPlayers.push(new YT.Player(frame, { events: { onStateChange: onVideoStateChange } }));
+        });
+    }
+    window.onYouTubeIframeAPIReady = initYouTubePlayers;
+
+    (function loadYouTubeApi() {
+        // Tambahkan origin website ke link video (dibutuhkan YouTube untuk kirim status play/pause)
+        if (location.protocol.startsWith('http')) {
+            document.querySelectorAll('.video-wrapper iframe').forEach(frame => {
+                if (!frame.src.includes('origin=')) {
+                    frame.src += (frame.src.includes('?') ? '&' : '?') + 'origin=' + encodeURIComponent(location.origin);
+                }
+            });
+        }
+        if (window.YT && YT.Player) { initYouTubePlayers(); return; }
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+    })();
+
+    // Cadangan: begitu tamu mengetuk/klik video, musik langsung dihentikan
+    window.addEventListener('blur', () => {
+        setTimeout(() => {
+            const el = document.activeElement;
+            if (el && el.tagName === 'IFRAME' && el.closest('.video-wrapper') && musicPlaying) {
+                pauseMusic();
+                musicPausedByVideo = true;
+            }
+        }, 0);
+    });
+
+    function anyVideoPlaying() {
+        if (!window.YT || !YT.PlayerState) return false;
+        return ytPlayers.some(p => p.getPlayerState && p.getPlayerState() === YT.PlayerState.PLAYING);
+    }
+
+    function onVideoStateChange(e) {
+        const S = YT.PlayerState;
+        if (e.data === S.PLAYING) {
+            // Hanya satu video yang jalan dalam satu waktu
+            ytPlayers.forEach(p => {
+                if (p !== e.target && p.getPlayerState && p.getPlayerState() === S.PLAYING) p.pauseVideo();
+            });
+            if (musicPlaying) { pauseMusic(); musicPausedByVideo = true; }
+        } else if (e.data === S.PAUSED || e.data === S.ENDED) {
+            if (musicPausedByVideo && !anyVideoPlaying()) {
+                musicPausedByVideo = false;
+                playMusic();
+            }
         }
     }
+
+    // Musik ikut berhenti saat tamu pindah tab / kunci layar, lalu lanjut lagi saat kembali
+    let musicPausedByTab = false;
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && musicPlaying) {
+            pauseMusic(); musicPausedByTab = true;
+        } else if (!document.hidden && musicPausedByTab) {
+            musicPausedByTab = false;
+            if (!anyVideoPlaying()) playMusic();
+        }
+    });
     
     // ===========================
     // COUNTDOWN
