@@ -16,7 +16,7 @@ Every guest receives a **personalized link** (e.g., `?to=Yanah+Ma'rifa`) — the
 
 The backend runs entirely on **Google Sheets + Google Apps Script** — no server, no database fees, no monthly subscriptions. Just deploy to GitHub Pages and you're done.
 
-> **Try it live:** [irfanaligit77.github.io/my-wedding-ali-alo-invitation/?to=Your+Name](https://irfanaligit77.github.io/my-wedding-ali-alo-invitation/?to=Your+Name)
+> **Try it live:** [irfanaligit77.github.io/my-wedding-ali-alo-invitation/?to=Your+Name](https://irfanaligit77.github.io/our-wedding-invitation-ali-alo/?to=Your+Name)
 
 ---
 
