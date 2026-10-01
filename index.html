@@ -21,6 +21,9 @@
     <!-- AOS Animations -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
+    <!-- Swiper (slider galeri) -->
+    <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <!-- Google tag (gtag.js) -->
@@ -190,7 +193,7 @@
         }
         .mempelai-card { flex: 1; min-width: 250px; max-width: 320px; }
         .mempelai-photo {
-            width: 200px; height: 200px; border-radius: 50%;
+            width: 300px; height: 300px; border-radius: 50%;
             object-fit: cover; border: 4px solid var(--gold-light);
             margin-bottom: 1.5rem;
             box-shadow: 0 8px 30px rgba(0,0,0,0.1);
@@ -309,77 +312,91 @@
             .nav-links a { font-size: 0.55rem; }
         }
 
-        /* ============ GALLERY (CAROUSEL) ============ */
+        /* ============ GALLERY (SWIPER COVERFLOW) ============ */
         .gallery-section { background: var(--white); }
-        .carousel { position: relative; margin-top: 2rem; }
-        .carousel-track {
-            position: relative;
-            display: flex; gap: 0.75rem;
-            overflow-x: auto; overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding: 0 9%;
+        .gallery {
+            position: relative; margin-top: 2.5rem;
+            width: min(100vw, 1100px);
+            margin-left: calc(50% - min(50vw, 550px));
         }
-        .carousel-track::-webkit-scrollbar { display: none; }
-        .carousel-slide {
-            flex: 0 0 82%;
-            scroll-snap-align: center;
+        .gallery-swiper {
+            padding: 0.5rem 0 1.5rem;
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+        }
+        .gallery-swiper .swiper-wrapper {
+            transition-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .gallery-slide {
+            width: min(76vw, 420px);
             aspect-ratio: 4 / 5;
-            overflow: hidden; cursor: zoom-in;
+            overflow: hidden; position: relative;
             background: var(--cream-dark);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            transition: opacity 0.4s ease, transform 0.4s ease;
-            opacity: 0.55; transform: scale(0.96);
+            box-shadow: 0 18px 40px rgba(58,58,58,0.14);
+            --p: 1; --d: 0ms;
         }
-        .carousel-slide.active { opacity: 1; transform: scale(1); }
-        .carousel-slide img {
+        .gallery-slide img {
             width: 100%; height: 100%; object-fit: cover; display: block;
+            transform: scale(1.1);
+            transition: transform 6s cubic-bezier(0.2, 0.6, 0.2, 1);
             user-select: none; -webkit-user-drag: none;
+            backface-visibility: hidden;
         }
-        .carousel-nav {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 42px; height: 42px; border-radius: 50%;
-            background: rgba(255,255,255,0.92); color: var(--charcoal);
-            border: 1px solid var(--cream-dark); cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-            transition: background 0.3s ease, opacity 0.3s ease; z-index: 2;
+        /* Ken Burns pelan di foto aktif */
+        .gallery-slide.swiper-slide-active img { transform: scale(1); }
+        /* Tirai krem di foto samping, mengikuti posisi geser */
+        .gallery-slide::before {
+            content: ''; position: absolute; inset: 0; z-index: 1;
+            background: var(--cream);
+            opacity: calc(var(--p) * 0.55);
+            transition: opacity var(--d) cubic-bezier(0.22, 0.61, 0.36, 1);
+            pointer-events: none;
         }
-        .carousel-nav:hover { background: var(--white); }
-        .carousel-nav:disabled { opacity: 0; pointer-events: none; }
-        .carousel-nav.prev { left: 0.25rem; }
-        .carousel-nav.next { right: 0.25rem; }
-        .carousel-nav svg { width: 20px; height: 20px; }
-        .carousel-counter {
-            text-align: center; margin-top: 1rem;
-            font-family: var(--font-display); font-size: 1.1rem;
-            color: var(--charcoal-light); letter-spacing: 0.1em;
+        /* Bingkai tipis di foto aktif */
+        .gallery-slide::after {
+            content: ''; position: absolute; inset: 12px; z-index: 2;
+            border: 1px solid rgba(255,255,255,0.7);
+            opacity: 0; transform: scale(1.03);
+            transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+            pointer-events: none;
         }
-        .carousel-hint {
-            text-align: center; font-size: 0.7rem; letter-spacing: 0.2em;
-            text-transform: uppercase; color: var(--sage); margin-top: 0.2rem;
-        }
-        .carousel-thumbs {
-            display: flex; gap: 0.5rem; margin-top: 1.2rem;
-            overflow-x: auto; padding: 0.25rem 0.25rem 0.5rem;
-            scrollbar-width: thin;
-        }
-        .carousel-thumbs::-webkit-scrollbar { height: 3px; }
-        .carousel-thumb {
-            flex: 0 0 64px; height: 64px; padding: 0;
-            border: 2px solid transparent; background: var(--cream-dark);
-            cursor: pointer; opacity: 0.5; overflow: hidden;
-            transition: opacity 0.3s ease, border-color 0.3s ease;
-        }
-        .carousel-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .carousel-thumb.active { opacity: 1; border-color: var(--gold); }
+        .gallery-slide.swiper-slide-active::after { opacity: 1; transform: scale(1); }
+        .gallery-slide.swiper-slide-active { cursor: zoom-in; }
 
-        @media (max-width: 640px) {
-            .carousel-track { padding: 0 6%; gap: 0.5rem; }
-            .carousel-slide { flex-basis: 88%; }
-            .carousel-nav { width: 36px; height: 36px; }
-            .carousel-thumb { flex-basis: 52px; height: 52px; }
+        .gallery-controls {
+            display: flex; align-items: center; justify-content: center;
+            gap: 1.5rem; margin-top: 0.5rem;
+        }
+        .g-nav {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: transparent; color: var(--charcoal);
+            border: 1px solid var(--gold-light); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+        .g-nav:hover { background: var(--gold); border-color: var(--gold); color: var(--white); }
+        .g-nav svg { width: 18px; height: 18px; }
+        .g-meta { width: 140px; text-align: center; }
+        .g-count {
+            font-family: var(--font-display); font-size: 1.05rem;
+            color: var(--charcoal-light); letter-spacing: 0.15em;
+        }
+        .g-count em {
+            font-style: italic; font-size: 1.6rem; color: var(--charcoal);
+            letter-spacing: 0.05em;
+        }
+        .g-progress {
+            height: 1px; background: var(--cream-dark);
+            margin-top: 0.4rem; overflow: hidden;
+        }
+        .g-progress span {
+            display: block; height: 100%; background: var(--gold);
+            transform-origin: left center; transform: scaleX(0);
+            transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .gallery-hint {
+            text-align: center; font-size: 0.68rem; letter-spacing: 0.25em;
+            text-transform: uppercase; color: var(--sage); margin-top: 1.2rem;
         }
 
         /* Lightbox */
@@ -434,6 +451,12 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .video-wrapper.landscape { max-width: 720px; aspect-ratio: 16/9; }
+        /* Video pertama: lebih besar, keluar dari lebar konten biasa */
+        .video-wrapper.featured {
+            max-width: none;
+            width: min(1000px, calc(100vw - 1rem));
+            margin-left: 50%; transform: translateX(-50%);
+        }
         .video-wrapper.portrait { max-width: 240px; aspect-ratio: 9/16; }
         .video-wrapper iframe {
             position: absolute; inset: 0; width: 100%; height: 100%;
@@ -859,17 +882,17 @@
                 <div class="mempelai-card" data-aos="fade-right" data-aos-delay="200">
                     <!-- GANTI: foto mempelai pria -->
                     <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-341.jpg" alt="Mempelai Pria">
-                    <p class="mempelai-name">Irfan</p>
+                    <p class="mempelai-name">IRFAN</p>
                     <p class="mempelai-fullname">Muh. Irfan Ali</p>
-                    <p class="mempelai-parent">Putra dari<br>Bapak Tekat & Almh. Ibu Nur Hasanah</p>
+                    <p class="mempelai-parent">Putra dari<br>Bapak Tekat</p>
                 </div>
                 <p class="mempelai-ampersand" data-aos="zoom-in" data-aos-delay="300">&amp;</p>
                 <div class="mempelai-card" data-aos="fade-left" data-aos-delay="200">
                     <!-- GANTI: foto mempelai wanita -->
                     <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-362 - Copy.jpg" alt="Mempelai Wanita">
-                    <p class="mempelai-name">Alodia</p>                   
+                    <p class="mempelai-name">ALODIA</p>                   
                     <p class="mempelai-fullname">Alodia Kinanti Faruqa</p>
-                    <p class="mempelai-parent">Putri dari<br>Bapak Imam Rohani & Ibu Nikmatim Bariroh</p>
+                    <p class="mempelai-parent">Putri dari<br>Bapak Imam Rohani</p>
                 </div>
             </div>
         </div>
@@ -964,14 +987,20 @@
             <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Gallery</h2>
             <div class="divider" data-aos="fade-up" data-aos-delay="150"></div>
             <!-- Daftar foto diatur di GALLERY_PHOTOS (bagian script di bawah) -->
-            <div class="carousel" data-aos="fade-up" data-aos-delay="200">
-                <div class="carousel-track" id="carousel-track"></div>
-                <button class="carousel-nav prev" id="carousel-prev" aria-label="Foto sebelumnya" onclick="carouselStep(-1)"><i data-lucide="chevron-left"></i></button>
-                <button class="carousel-nav next" id="carousel-next" aria-label="Foto berikutnya" onclick="carouselStep(1)"><i data-lucide="chevron-right"></i></button>
+            <div class="gallery" data-aos="fade-up" data-aos-delay="200">
+                <div class="swiper gallery-swiper" id="gallery-swiper">
+                    <div class="swiper-wrapper" id="gallery-wrapper"></div>
+                </div>
+                <div class="gallery-controls">
+                    <button class="g-nav" id="g-prev" aria-label="Foto sebelumnya"><i data-lucide="chevron-left"></i></button>
+                    <div class="g-meta">
+                        <p class="g-count"><em id="g-current">01</em> / <span id="g-total">00</span></p>
+                        <div class="g-progress"><span id="g-bar"></span></div>
+                    </div>
+                    <button class="g-nav" id="g-next" aria-label="Foto berikutnya"><i data-lucide="chevron-right"></i></button>
+                </div>
+                <p class="gallery-hint">Geser &middot; ketuk foto untuk memperbesar</p>
             </div>
-            <p class="carousel-counter" id="carousel-counter"></p>
-            <p class="carousel-hint">Geser untuk melihat foto lainnya</p>
-            <div class="carousel-thumbs" id="carousel-thumbs"></div>
         </div>
     </section>
 
@@ -984,9 +1013,9 @@
             <!-- GANTI: link YouTube video -->
             <div class="video-list">
                 <div class="video-item" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="video-wrapper landscape">
-                        <iframe src="https://www.youtube.com/embed/ENNRYtpBbM8?rel=0"
-                            title="Engagement Irfan & Alodia — Video 1"
+                    <div class="video-wrapper landscape featured">
+                        <iframe src="https://www.youtube.com/embed/_bTzxku3Gm0?rel=0"
+                            title="Sneakpeek Engagement Alodia & Irfan"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin"
                             allowfullscreen loading="lazy">
@@ -995,8 +1024,8 @@
                 </div>
                 <div class="video-item" data-aos="zoom-in" data-aos-delay="200">
                     <div class="video-wrapper landscape">
-                        <iframe src="https://www.youtube.com/embed/_bTzxku3Gm0?rel=0"
-                            title="Engagement Irfan & Alodia — Video 2"
+                        <iframe src="https://www.youtube.com/embed/ENNRYtpBbM8?rel=0"
+                            title="Engagement Irfan & Alodia — Kediri, 6 September 2026"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin"
                             allowfullscreen loading="lazy">
@@ -1194,10 +1223,10 @@
 
     <!-- ============ FOOTER ============ -->
     <footer>
-        <p class="footer-names">Ali ❤️❤️ Alo</p>
-        <p class="footer-thanks">Terima kasih atas doa & kehadirannya</p>
+        <p class="footer-names">Ali ❤️ Alo</p>
+        <p class="footer-thanks">Terima kasih atas doa & kehadirannya.</p>
         <p class="footer-thanks">Made with ❤️ — Copyright by Muh. Irfan Ali (Ali Software Developer) ✍️</p>
-        <p class="footer-thanks">This Website invitation is dedicated for my wife Alodia Kinanti Faruqa. This our wedding invitation :D</p>
+        <p class="footer-thanks">This Website invitation is dedicated for my wife Alodia Kinanti Faruqa. This our wedding invitation ✨</p>
         <p class="footer-credit"></p>
         <p class="footer-credit"></p>
         <p class="footer-credit"></p>
@@ -1205,6 +1234,7 @@
 
     <!-- ============ SCRIPTS ============ -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
     // ===========================
     // KONFIGURASI — GANTI SESUAI KEBUTUHANMU
@@ -1232,6 +1262,7 @@
     // ===========================
     let currentSlide = 0;
     let lightboxIndex = 0;
+    let gallerySwiper = null;
     const GALLERY_PATH = 'assets/images/';
     const GALLERY_PHOTOS = [
         // --- Sneakpeek ---
@@ -1319,77 +1350,71 @@
     setInterval(updateCountdown, 1000);
     
     // ===========================
-    // GALLERY CAROUSEL
+    // GALLERY — SWIPER COVERFLOW
     // ===========================
     function photoUrl(file) {
         return GALLERY_PATH + encodeURIComponent(file);
     }
 
-    function buildGallery() {
-        const track = document.getElementById('carousel-track');
-        const thumbs = document.getElementById('carousel-thumbs');
+    function pad2(n) { return String(n).padStart(2, '0'); }
 
-        track.innerHTML = GALLERY_PHOTOS.map((f, i) => `
-            <div class="carousel-slide${i === 0 ? ' active' : ''}" onclick="openLightbox(${i})">
-                <img src="${photoUrl(f)}" alt="Foto engagement ${i + 1}" loading="${i < 2 ? 'eager' : 'lazy'}" draggable="false">
+    function buildGallery() {
+        const wrapper = document.getElementById('gallery-wrapper');
+        wrapper.innerHTML = GALLERY_PHOTOS.map((f, i) => `
+            <div class="swiper-slide gallery-slide" data-index="${i}">
+                <img src="${photoUrl(f)}" alt="Foto engagement ${i + 1}"
+                     loading="${i < 3 || i > GALLERY_PHOTOS.length - 3 ? 'eager' : 'lazy'}"
+                     decoding="async" draggable="false">
             </div>
         `).join('');
+        document.getElementById('g-total').textContent = pad2(GALLERY_PHOTOS.length);
 
-        thumbs.innerHTML = GALLERY_PHOTOS.map((f, i) => `
-            <button class="carousel-thumb${i === 0 ? ' active' : ''}" aria-label="Foto ${i + 1}" onclick="goToSlide(${i})">
-                <img src="${photoUrl(f)}" alt="" loading="lazy" draggable="false">
-            </button>
-        `).join('');
-
-        // Deteksi slide aktif saat digeser (swipe / scroll)
-        let ticking = false;
-        track.addEventListener('scroll', () => {
-            if (ticking) return;
-            ticking = true;
-            requestAnimationFrame(() => {
-                const center = track.scrollLeft + track.clientWidth / 2;
-                let nearest = 0, best = Infinity;
-                track.querySelectorAll('.carousel-slide').forEach((s, i) => {
-                    const d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - center);
-                    if (d < best) { best = d; nearest = i; }
-                });
-                setActiveSlide(nearest);
-                ticking = false;
-            });
-        }, { passive: true });
-
-        setActiveSlide(0);
+        gallerySwiper = new Swiper('#gallery-swiper', {
+            effect: 'coverflow',
+            centeredSlides: true,
+            slidesPerView: 'auto',
+            loop: true,
+            speed: 900,
+            grabCursor: true,
+            watchSlidesProgress: true,
+            coverflowEffect: { rotate: 0, stretch: 0, depth: 220, modifier: 1, scale: 1, slideShadows: false },
+            autoplay: { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true },
+            keyboard: { enabled: true, onlyInViewport: true },
+            navigation: { prevEl: '#g-prev', nextEl: '#g-next' },
+            on: {
+                init(s) { updateGalleryMeta(s); },
+                slideChange(s) { updateGalleryMeta(s); },
+                progress(s) {
+                    // Tirai krem ikut jari: 0 = foto tengah, 1 = foto samping
+                    s.slides.forEach(slide => {
+                        slide.style.setProperty('--p', Math.min(Math.abs(slide.progress), 1).toFixed(3));
+                    });
+                },
+                setTransition(s, duration) {
+                    s.slides.forEach(slide => slide.style.setProperty('--d', duration + 'ms'));
+                },
+                click(s) {
+                    const slide = s.clickedSlide;
+                    if (!slide) return;
+                    if (slide.classList.contains('swiper-slide-active')) {
+                        openLightbox(Number(slide.dataset.index));
+                    } else {
+                        s.slideToLoop(Number(slide.dataset.index));
+                    }
+                }
+            }
+        });
     }
 
-    function setActiveSlide(i) {
-        currentSlide = i;
-        const slides = document.querySelectorAll('.carousel-slide');
-        const thumbs = document.querySelectorAll('.carousel-thumb');
-        slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
-        thumbs.forEach((t, idx) => t.classList.toggle('active', idx === i));
-
-        document.getElementById('carousel-counter').textContent = (i + 1) + ' / ' + GALLERY_PHOTOS.length;
-        document.getElementById('carousel-prev').disabled = i === 0;
-        document.getElementById('carousel-next').disabled = i === GALLERY_PHOTOS.length - 1;
-
-        // Pastikan thumbnail aktif kelihatan di strip
-        const strip = document.getElementById('carousel-thumbs');
-        const t = thumbs[i];
-        if (t) {
-            strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.offsetWidth) / 2, behavior: 'smooth' });
-        }
+    function updateGalleryMeta(s) {
+        const i = s.realIndex;
+        document.getElementById('g-current').textContent = pad2(i + 1);
+        document.getElementById('g-bar').style.transform = 'scaleX(' + ((i + 1) / GALLERY_PHOTOS.length) + ')';
     }
 
     function goToSlide(i) {
-        const track = document.getElementById('carousel-track');
-        const slides = track.querySelectorAll('.carousel-slide');
-        i = Math.max(0, Math.min(i, slides.length - 1));
-        const s = slides[i];
-        track.scrollTo({ left: s.offsetLeft - (track.clientWidth - s.offsetWidth) / 2, behavior: 'smooth' });
-        setActiveSlide(i);
+        if (gallerySwiper) gallerySwiper.slideToLoop(i, 0);
     }
-
-    function carouselStep(dir) { goToSlide(currentSlide + dir); }
 
     // ===========================
     // LIGHTBOX
@@ -1398,10 +1423,12 @@
         lightboxIndex = i;
         showLightboxPhoto();
         document.getElementById('lightbox').classList.add('active');
+        if (gallerySwiper) gallerySwiper.autoplay.stop();
     }
     function closeLightbox() {
         document.getElementById('lightbox').classList.remove('active');
         goToSlide(lightboxIndex); // slider ikut ke foto terakhir yang dilihat
+        if (gallerySwiper) gallerySwiper.autoplay.start();
     }
     function showLightboxPhoto() {
         document.getElementById('lightbox-img').src = photoUrl(GALLERY_PHOTOS[lightboxIndex]);
