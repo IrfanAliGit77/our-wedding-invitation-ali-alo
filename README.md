@@ -4,7 +4,7 @@
 
 > *A modern, elegant, fully-featured digital wedding invitation — built from scratch with pure HTML, CSS, and JavaScript. Zero frameworks. Zero cost. Infinite love.*
 
-[🌐 Live Demo](https://irfanaligit77.github.io/my-wedding-ali-alo-invitation/?to=Tamu+Undangan) · [✨ Features](#-features) · [🚀 Setup Guide](#-getting-started) · [💕 Dedication](#-for-alodia)
+[🌐 Live Demo](https://irfanaligit77.github.io/our-wedding-invitation-ali-alo/?to=Tamu+Undangan) · [✨ Features](#-features) · [🚀 Setup Guide](#-getting-started) · [💕 Dedication](#-for-alodia)
 
 ---
 
