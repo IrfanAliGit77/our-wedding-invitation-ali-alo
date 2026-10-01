@@ -951,14 +951,48 @@
             border: 1px solid rgba(240,232,219,0.15); pointer-events: none;
         }
 
-        /* Mempelai — foto bentuk lengkung (arch) */
-        .mempelai-photo {
-            width: 280px; height: 360px; border: none;
-            border-radius: 999px 999px 4px 4px;
-            outline: 1px solid var(--gold); outline-offset: 9px;
-            margin-bottom: 2.2rem;
-            box-shadow: 0 22px 45px rgba(58,58,58,0.14);
+        /* Mempelai — foto bulat dengan bingkai cincin emas */
+        .mempelai-frame {
+            position: relative; width: 270px; height: 270px;
+            margin: 1.8rem auto 2.8rem;
         }
+        .mempelai-photo {
+            position: relative; z-index: 1;
+            width: 100%; height: 100%; display: block;
+            border-radius: 50%; object-fit: cover;
+            border: 5px solid var(--white);
+            outline: none; margin: 0;
+            box-shadow: 0 18px 40px rgba(58,58,58,0.16);
+        }
+        /* Cincin emas tipis */
+        .mempelai-frame::before {
+            content: ''; position: absolute; inset: -12px; border-radius: 50%;
+            border: 1px solid var(--gold);
+        }
+        /* Cincin putus-putus luar yang berputar pelan */
+        .mempelai-frame::after {
+            content: ''; position: absolute; inset: -24px; border-radius: 50%;
+            border: 1px dashed rgba(201,169,110,0.55);
+            animation: ringSpin 60s linear infinite;
+        }
+        @keyframes ringSpin { to { transform: rotate(360deg); } }
+        /* Permata kecil di atas & bawah cincin */
+        .mf-gem {
+            position: absolute; left: 50%; z-index: 2;
+            width: 9px; height: 9px; background: var(--gold);
+            transform: translateX(-50%) rotate(45deg);
+            box-shadow: 0 0 0 4px var(--cream);
+        }
+        .mf-gem.top { top: -17px; }
+        .mf-gem.bottom { bottom: -17px; }
+        /* Ranting daun di kiri-bawah & kanan-bawah */
+        .mf-sprig {
+            display: none;
+            position: absolute; bottom: -30px; width: 96px; height: 96px; z-index: 2;
+            color: var(--sage-dark); opacity: 0.85; pointer-events: none;
+        }
+        .mf-sprig.left { left: -42px; }
+        .mf-sprig.right { right: -42px; transform: scaleX(-1); }
         .mempelai-name { font-size: 2.4rem; font-weight: 300; }
         .mempelai-fullname { letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.75rem; margin-top: 0.4rem; }
         .mempelai-ampersand { font-style: italic; font-size: 4.5rem; }
@@ -1021,7 +1055,10 @@
         @media (max-width: 640px) {
             section { padding-top: 4.5rem; padding-bottom: 4.5rem; }
             .cover-inner .couple-name { font-size: 2.9rem; }
-            .mempelai-photo { width: 200px; height: 266px; }
+            .mempelai-frame { width: 220px; height: 220px; }
+            .mf-sprig { width: 80px; height: 80px; bottom: -26px; }
+            .mf-sprig.left { left: -34px; }
+            .mf-sprig.right { right: -34px; }
             .quran-section .section-inner { padding: 2.5rem 1.2rem; }
             .countdown-item { min-width: 70px; padding: 1.5rem 0.6rem 1rem; }
             .video-section { padding-top: 4.5rem; padding-bottom: 4.5rem; }
@@ -1130,7 +1167,9 @@
             <div class="mempelai-grid">
                 <div class="mempelai-card" data-aos="fade-right" data-aos-delay="200">
                     <!-- GANTI: foto mempelai pria -->
-                    <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-341.jpg" alt="Mempelai Pria">
+                    <div class="mempelai-frame"><span class="mf-gem top"></span>
+                        <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-341.jpg" alt="Mempelai Pria">
+                        <span class="mf-gem bottom"></span><svg class="mf-sprig left" viewBox="0 0 200 200" aria-hidden="true"><use href="#sprig"/></svg><svg class="mf-sprig right" viewBox="0 0 200 200" aria-hidden="true"><use href="#sprig"/></svg></div>
                     <p class="mempelai-name">Irfan</p>
                     <p class="mempelai-fullname">Muh. Irfan Ali</p>
                     <p class="mempelai-parent">Putra dari<br>Bapak Tekat</p>
@@ -1138,7 +1177,9 @@
                 <p class="mempelai-ampersand" data-aos="zoom-in" data-aos-delay="300">&amp;</p>
                 <div class="mempelai-card" data-aos="fade-left" data-aos-delay="200">
                     <!-- GANTI: foto mempelai wanita -->
-                    <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-362 - Copy.jpg" alt="Mempelai Wanita">
+                    <div class="mempelai-frame"><span class="mf-gem top"></span>
+                        <img class="mempelai-photo" src="assets\images\Profile\Alodia Irfan - Engagement-362 - Copy.jpg" alt="Mempelai Wanita">
+                        <span class="mf-gem bottom"></span><svg class="mf-sprig left" viewBox="0 0 200 200" aria-hidden="true"><use href="#sprig"/></svg><svg class="mf-sprig right" viewBox="0 0 200 200" aria-hidden="true"><use href="#sprig"/></svg></div>
                     <p class="mempelai-name">Alodia</p>                   
                     <p class="mempelai-fullname">Alodia Kinanti Faruqa</p>
                     <p class="mempelai-parent">Putri dari<br>Bapak Imam Rohani</p>
@@ -1423,8 +1464,8 @@
             </div>
 
             <!-- Gift Registry -->
-            <p class="gift-subtitle" data-aos="fade-up">Gift Registry - bila hendak memberikan hadiah barang bukan berupa uang.</p>
-            <p class="gift-desc" data-aos="fade-up">Pilih hadiah untuk kami. Setelah diklaim, hadiah tidak bisa dipilih orang lain supaya tidak dobel.</p>
+            <p class="gift-subtitle" data-aos="fade-up">Gift Registry - A little something to make our new chapter even more special.</p>
+            <p class="gift-desc" data-aos="fade-up">Bagi teman-teman yang berkenan memberikan hadiah dalam bentuk barang, kami telah menyediakan daftar pilihan agar setiap hadiah dapat menjadi sesuatu yang istimewa dan tidak berulang.</p>
 
             <!-- GANTI: alamat pengiriman -->
             <div class="shipping-address" data-aos="fade-up">
