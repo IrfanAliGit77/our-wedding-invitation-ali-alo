@@ -666,6 +666,51 @@
             min-height: 1.2rem;
         }
 
+        /* ============ DISPOSABLE CAMERA (QR) ============ */
+        .camera-section {
+            background:
+                radial-gradient(circle at 12% 0%, rgba(201,169,110,0.10), transparent 38%),
+                radial-gradient(circle at 88% 100%, rgba(139,157,119,0.10), transparent 42%),
+                var(--cream);
+            text-align: center;
+        }
+        .camera-lead {
+            font-family: var(--font-display); font-style: italic; font-size: 1.15rem;
+            line-height: 1.8; color: var(--charcoal-light); max-width: 480px; margin: 0 auto;
+        }
+        .camera-card {
+            position: relative; background: var(--white); max-width: 340px; margin: 2rem auto 0;
+            padding: 2.2rem 1.8rem 2rem; box-shadow: 0 10px 35px rgba(58,58,58,0.06);
+        }
+        .camera-card::before {
+            content: ''; position: absolute; inset: 7px;
+            border: 1px solid rgba(201,169,110,0.35); pointer-events: none;
+        }
+        .camera-card > * { position: relative; }
+        .camera-kicker {
+            font-size: 0.66rem; letter-spacing: 0.4em; text-transform: uppercase;
+            color: var(--sage); font-weight: 500;
+        }
+        .camera-qr { width: 200px; height: 200px; margin: 1.2rem auto 1rem; display: block; }
+        .camera-qr svg { width: 100%; height: 100%; display: block; }
+        .camera-when {
+            font-size: 0.82rem; color: var(--charcoal-light); line-height: 1.6; margin-bottom: 1.2rem;
+        }
+        .camera-when b { color: var(--sage-dark); font-weight: 500; }
+        .btn-camera {
+            display: inline-block; padding: 0.85rem 2rem; background: var(--sage); color: var(--cream);
+            font-family: var(--font-body); font-size: 0.72rem; letter-spacing: 0.24em;
+            text-transform: uppercase; text-decoration: none; transition: background 0.4s ease;
+        }
+        .btn-camera:hover { background: var(--gold); }
+        .camera-steps {
+            list-style: none; max-width: 340px; margin: 1.6rem auto 0; padding: 0;
+            font-size: 0.88rem; color: var(--charcoal-light); text-align: left;
+        }
+        .camera-steps li { display: flex; gap: 0.8rem; align-items: baseline; padding: 0.45rem 0; border-bottom: 1px solid var(--cream-dark); }
+        .camera-steps li:last-child { border-bottom: 0; }
+        .camera-steps li b { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 1.2rem; color: var(--gold); flex: none; }
+
         /* ============ GIFT / REKENING ============ */
         .gift-section { background: var(--white); text-align: center; }
         .rekening-grid {
@@ -1362,7 +1407,7 @@
                         <div class="venue-card" data-aos="fade-up" data-aos-delay="200">
                 <p class="venue-type">Akad - Ijab & Qobul</p>
                 <!-- GANTI: detail venue -->
-                <p class="venue-name">Godhong Restaurant - Bukit Daun Hotel & Resort</p>
+                <p class="venue-name">Bukit Daun Hotel & Resort</p>
                 <p class="venue-detail">Jumat, 25 Desember 2026</p>
                 <p class="venue-detail">Pukul 07.00 — 08.00 WIB</p>
                 <p class="venue-detail" style="margin-top:0.5rem;">Jl. Argowilis No.777, Bajang, Semen, Kec. Semen, Kabupaten Kediri, Jawa Timur 64161</p>
@@ -1380,7 +1425,7 @@
             <div class="venue-card" data-aos="fade-up" data-aos-delay="200">
                 <p class="venue-type">Wedding Reception</p>
                 <!-- GANTI: detail venue -->
-                <p class="venue-name">Godhong Restaurant - Bukit Daun Hotel & Resort</p>
+                <p class="venue-name">Bukit Daun Hotel & Resort</p>
                 <p class="venue-detail">Jumat, 25 Desember 2026</p>
                 <p class="venue-detail">Pukul 13.00 — 15.00 WIB</p>
                 <p class="venue-detail" style="margin-top:0.5rem;">Jl. Argowilis No.777, Bajang, Semen, Kec. Semen, Kabupaten Kediri, Jawa Timur 64161</p>
@@ -1441,6 +1486,32 @@
                 <button type="submit" class="btn-submit" id="rsvp-btn">Kirim Konfirmasi</button>
                 <p class="form-msg" id="rsvp-msg"></p>
             </form>
+        </div>
+    </section>
+
+    <!-- ============ 8b. DISPOSABLE CAMERA ============ -->
+    <section class="camera-section" id="camera">
+        <div class="section-inner">
+            <p class="section-label" data-aos="fade-up">Disposable Camera</p>
+            <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Abadikan Momen Kami</h2>
+            <div class="divider" data-aos="fade-up" data-aos-delay="150"></div>
+            <p class="camera-lead" data-aos="fade-up" data-aos-delay="200">
+                Di hari bahagia nanti, kami ingin melihat pernikahan kami dari sudut pandangmu.
+                Scan kode di bawah ini, jepret sesukamu, dan biarkan hasilnya menjadi kenangan bersama.
+            </p>
+
+            <div class="camera-card" data-aos="fade-up" data-aos-delay="250">
+                <p class="camera-kicker">Scan &amp; Jepret</p>
+                <div class="camera-qr" id="camera-qr" role="img" aria-label="Kode QR menuju kamera disposable"></div>
+                <p class="camera-when">Kamera dibuka pada hari acara,<br><b>Jumat, 25 Desember 2026</b></p>
+                <a class="btn-camera" id="camera-link" href="#" target="_blank" rel="noopener">Buka Kamera</a>
+            </div>
+
+            <ul class="camera-steps" data-aos="fade-up" data-aos-delay="300">
+                <li><b>01</b><span>Scan kode QR atau ketuk tombol Buka Kamera.</span></li>
+                <li><b>02</b><span>Tulis namamu, lalu izinkan akses kamera.</span></li>
+                <li><b>03</b><span>Jepret foto dan video. Semuanya masuk ke album bersama.</span></li>
+            </ul>
         </div>
     </section>
 
@@ -1548,6 +1619,7 @@
 
     <!-- ============ SCRIPTS ============ -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
     // ===========================
@@ -2135,6 +2207,24 @@
         btn.disabled = false; btn.textContent = 'Request Lagu';
     }
     
+    // ===========================
+    // DISPOSABLE CAMERA — QR & LINK
+    // ===========================
+    // GANTI: link tamu dari dashboard kamera (tombol "Salin Link Tamu")
+    const CAMERA_URL = 'https://irfanaligit77.github.io/disposable-camera-wedding-ali-alo/?e=wedding-irfan-alo-25-des-2026';
+
+    (function () {
+        document.getElementById('camera-link').href = CAMERA_URL;
+        const box = document.getElementById('camera-qr');
+        if (typeof qrcode !== 'function') { box.style.display = 'none'; return; }   // library QR gagal dimuat: tombol tetap berfungsi
+        const q = qrcode(0, 'M');
+        q.addData(CAMERA_URL);
+        q.make();
+        box.innerHTML = q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+        const svg = box.querySelector('svg');
+        if (svg) { svg.removeAttribute('width'); svg.removeAttribute('height'); }
+    })();
+
     // ===========================
     // UTILITIES
     // ===========================
