@@ -14,13 +14,22 @@
 // PENTING: Buat 4 Sheet (tab) di Google Sheets kamu:
 //   - "wishes"   → kolom: name | message | date
 //   - "rsvp"     → kolom: name | attend | jumlah | date
-//   - "gifts"    → kolom: id | nama | gambar | harga | status | diklaim_oleh | waktu_klaim
+//   - "gifts"    → kolom: id | nama | gambar | harga | status | diklaim_oleh | waktu_klaim | link | qty | terklaim
 //   - "playlist"  → kolom: name | song | date
 //
-// Untuk sheet "gifts", isi data hadiah yang kamu mau:
-//   id=1, nama=Rice Cooker, gambar=URL_GAMBAR, harga=Rp 500.000, status=available, diklaim_oleh=(kosong), waktu_klaim=(kosong)
-//   id=2, nama=Blender, gambar=URL_GAMBAR, harga=Rp 350.000, status=available, diklaim_oleh=(kosong), waktu_klaim=(kosong)
-//   ... dst
+// Untuk sheet "gifts", isi data hadiah yang kamu mau (kolom A sampai J):
+//   A id        : 1, 2, 3 ... (unik)
+//   B nama      : Rice Cooker
+//   C gambar    : URL gambar (boleh kosong)
+//   D harga     : Rp 500.000
+//   E status    : available   (diisi otomatis jadi "claimed" kalau jumlahnya sudah terpenuhi)
+//   F diklaim_oleh : kosongkan (diisi otomatis, nama-nama pemberi dipisah koma)
+//   G waktu_klaim  : kosongkan (diisi otomatis)
+//   H link      : link Tokopedia/Shopee (boleh kosong)
+//   I qty       : berapa buah yang dibutuhkan, misal 3 (kosong = 1)
+//   J terklaim  : kosongkan (diisi otomatis: sudah berapa buah yang diberikan)
+//
+// Hadiah tetap bisa dipilih tamu lain selama terklaim < qty.
 // ============================================================
 
 // Enable CORS
@@ -53,15 +62,7 @@ function doGet(e) {
           const sheet = ss.getSheetByName('gifts');
           if (!sheet) return createJsonResponse({ gifts: [] });
           const [headers, ...rows] = sheet.getDataRange().getValues();
-          const gifts = rows.filter(row => row[0]).map(row => ({
-              id: row[0],
-              nama: row[1],
-              gambar: row[2],
-              harga: row[3],
-              status: row[4] || 'available',
-              diklaim_oleh: row[5] || '',
-              link: row[7] || ''
-          }));
+          const gifts = rows.filter(row => row[0]).map(row => publicGift(giftFromRow(row)));
           return createJsonResponse({ gifts });
       }
 
@@ -124,20 +125,33 @@ function doPost(e) {
       case 'claim_gift': {
         const sheet = ss.getSheetByName('gifts');
         if (!sheet) throw new Error('Sheet "gifts" tidak ditemukan');
-        const data = sheet.getDataRange().getValues();
-        
-        for (let i = 1; i < data.length; i++) {
-          if (String(data[i][0]) === String(body.id)) {
-            if (data[i][4] === 'claimed') {
-              return createJsonResponse({ success: false, message: 'Hadiah sudah diklaim orang lain' });
+        // Dikunci supaya dua tamu yang menekan bersamaan tidak sama-sama mendapat jatah terakhir
+        const lock = LockService.getScriptLock();
+        lock.waitLock(20000);
+        try {
+          const data = sheet.getDataRange().getValues();
+          for (let i = 1; i < data.length; i++) {
+            if (String(data[i][0]) !== String(body.id)) continue;
+            const g = giftFromRow(data[i]);
+            if (g.sisa <= 0) {
+              return createJsonResponse(Object.assign({ success: false, message: 'Maaf, hadiah ini sudah diklaim oleh tamu lain.' }, publicGift(g)));
             }
-            sheet.getRange(i + 1, 5).setValue('claimed');
-            sheet.getRange(i + 1, 6).setValue(body.nama_tamu);
-            sheet.getRange(i + 1, 7).setValue(new Date().toLocaleString('id-ID'));
-            return createJsonResponse({ success: true, message: 'Hadiah berhasil diklaim' });
+            const nama = String(body.nama_tamu || 'Tamu').replace(/^[=+\-@]+/, '').trim().slice(0, 60) || 'Tamu';
+            const waktu = new Date().toLocaleString('id-ID');
+            const names = g.pemberi.concat([nama]);
+            const times = String(data[i][6] || '').split(' | ').filter(String).concat([waktu]);
+            const terklaim = g.terklaim + 1;
+            const status = terklaim >= g.qty ? 'claimed' : 'available';
+            sheet.getRange(i + 1, 5, 1, 3).setValues([[status, names.join(', '), times.join(' | ')]]);   // E, F, G
+            sheet.getRange(i + 1, 10).setValue(terklaim);                                             // J
+            const row = data[i].slice();
+            row[4] = status; row[5] = names.join(', '); row[9] = terklaim;
+            return createJsonResponse(Object.assign({ success: true, message: 'Hadiah berhasil diklaim' }, publicGift(giftFromRow(row))));
           }
+          return createJsonResponse({ success: false, message: 'Hadiah tidak ditemukan' });
+        } finally {
+          lock.releaseLock();
         }
-        return createJsonResponse({ success: false, message: 'Hadiah tidak ditemukan' });
       }
 
       case 'playlist': {
@@ -153,6 +167,28 @@ function doPost(e) {
   } catch (error) {
     return createJsonResponse({ error: error.message });
   }
+}
+
+// Satu baris sheet "gifts" -> data hadiah lengkap dengan jumlah & sisa
+function giftFromRow(row) {
+  const qty = Math.max(1, parseInt(row[8], 10) || 1);
+  const pemberi = String(row[5] || '').split(',').map(function (x) { return x.trim(); }).filter(String);
+  // kolom J kosong (data lama): hitung dari jumlah nama pemberi
+  let terklaim = (row[9] === '' || row[9] === null || row[9] === undefined) ? pemberi.length : (parseInt(row[9], 10) || 0);
+  if (terklaim === 0 && String(row[4]).toLowerCase() === 'claimed' && !pemberi.length) terklaim = qty;   // ditandai manual "claimed"
+  const sisa = Math.max(0, qty - terklaim);
+  return {
+    id: row[0], nama: row[1], gambar: row[2], harga: row[3],
+    status: sisa <= 0 ? 'claimed' : 'available',
+    diklaim_oleh: pemberi.join(', '), pemberi: pemberi,
+    link: row[7] || '',
+    qty: qty, terklaim: Math.min(terklaim, qty), sisa: sisa
+  };
+}
+
+// Yang boleh dilihat tamu: tanpa nama pemberi (tetap anonim). Nama hanya tersimpan di Sheet.
+function publicGift(g) {
+  return { id: g.id, nama: g.nama, gambar: g.gambar, harga: g.harga, status: g.status, link: g.link };
 }
 
 // Auto-detect action from POST body

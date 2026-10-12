@@ -803,6 +803,7 @@
         }
         .gift-card.claimed .btn-claim { display: none; }
         .gift-card.claimed .claimed-badge { display: block; }
+        .btn-claim:disabled { opacity: 0.6; cursor: wait; }
 
         /* ============ WISHES ============ */
         .wishes-section { background: var(--cream); }
@@ -2059,6 +2060,24 @@
     // ===========================
     // GIFT REGISTRY
     // ===========================
+    // Hadiah tertutup hanya kalau jumlahnya (qty) sudah terpenuhi. Siapa pemberinya tidak ditampilkan (anonim).
+    function giftCardHtml(g) {
+        const isClaimed = String(g.status || '').toLowerCase() === 'claimed';
+        const safeNama = escapeHtml(g.nama || '');
+        const safeLink = g.link || '';
+        return `
+                <div class="gift-card ${isClaimed ? 'claimed' : ''}" data-id="${escapeHtml(String(g.id))}">
+                    ${g.gambar ? `<img class="gift-img" src="${g.gambar}" alt="${safeNama}" onerror="this.style.display='none'">` : '<div class="gift-img" style="display:flex;align-items:center;justify-content:center;color:var(--sage);font-size:2rem;">🎁</div>'}
+                    <div class="gift-info">
+                        <p class="gift-name">${safeNama}</p>
+                        <p class="gift-price">${escapeHtml(String(g.harga || ''))}</p>
+                        <button class="btn-claim" onclick="claimGift('${String(g.id).replace(/'/g, "\\'")}', '${safeNama.replace(/'/g, "\\'")}', '${safeLink.replace(/'/g, "\\'")}')">Berikan Hadiah</button>
+                        <p class="claimed-badge">Sudah diklaim</p>
+                    </div>
+                </div>
+            `;
+    }
+
     async function loadGifts() {
         const grid = document.getElementById('gift-grid');
         let gifts = CONFIG.defaultGifts;
@@ -2073,22 +2092,7 @@
             return;
         }
 
-        grid.innerHTML = gifts.map(g => {
-            const isClaimed = String(g.status || '').toLowerCase() === 'claimed';
-            const safeNama = escapeHtml(g.nama || '');
-            const safeLink = g.link || '';
-            return `
-                <div class="gift-card ${isClaimed ? 'claimed' : ''}" data-id="${g.id}">
-                    ${g.gambar ? `<img class="gift-img" src="${g.gambar}" alt="${safeNama}" onerror="this.style.display='none'">` : '<div class="gift-img" style="display:flex;align-items:center;justify-content:center;color:var(--sage);font-size:2rem;">🎁</div>'}
-                    <div class="gift-info">
-                        <p class="gift-name">${safeNama}</p>
-                        <p class="gift-price">${escapeHtml(String(g.harga || ''))}</p>
-                        <button class="btn-claim" onclick="claimGift(${g.id}, '${safeNama.replace(/'/g, "\\'")}', '${safeLink.replace(/'/g, "\\'")}')">Berikan Hadiah</button>
-                        <p class="claimed-badge">Sudah diklaim${g.diklaim_oleh ? ' oleh ' + escapeHtml(g.diklaim_oleh) : ''}</p>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        grid.innerHTML = gifts.map(giftCardHtml).join('');
     }
 
     async function claimGift(id, nama, link) {
@@ -2137,27 +2141,45 @@
         }
     }
 
+    // POST yang jawabannya BISA dibaca (untuk klaim hadiah: perlu tahu masih ada sisa atau sudah habis)
+    async function apiPostRead(data) {
+        const res = await fetch(CONFIG.apiBase, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(data),
+            redirect: 'follow'
+        });
+        return res.json();
+    }
+
     async function prosesKlaim(id, guest) {
-        // Tampilkan loading di tombol (opsional biar ada feedback)
+        const card = document.querySelector('.gift-card[data-id="' + id + '"]');
+        const btn = card ? card.querySelector('.btn-claim') : null;
+        if (btn) { btn.disabled = true; btn.textContent = 'Memproses...'; }
         showToast('Memproses klaim...');
 
-        // Tembak ke Apps Script
-        await apiPost({
-            action: 'claim_gift',
-            id: id,
-            nama_tamu: guest
-        });
-
-        // Update UI langsung blur
-        const card = document.querySelector('.gift-card[data-id="' + id + '"]');
-        if (card) {
-            card.classList.add('claimed');
-            const badge = card.querySelector('.claimed-badge');
-            if (badge) badge.textContent = 'Diklaim oleh ' + guest;
+        let r = null;
+        try {
+            r = await apiPostRead({ action: 'claim_gift', id: id, nama_tamu: guest });
+        } catch (err) {
+            // Jawaban server tidak terbaca (jarang terjadi): kirim dengan cara lama, lalu muat ulang daftar dari server
+            await apiPost({ action: 'claim_gift', id: id, nama_tamu: guest });
+            showToast('Terima kasih ' + guest + '! Klaim terkirim.');
+            setTimeout(loadGifts, 1500);
+            return;
         }
-        showToast('Terima kasih ' + guest + '! Hadiah berhasil diklaim.');
-    } 
-// ===========================
+
+        if (r && r.success) {
+            // Perbarui kartu: tetap bisa diklik kalau jumlahnya belum terpenuhi, tertutup kalau sudah
+            if (card) card.outerHTML = giftCardHtml(r);
+            showToast('Terima kasih ' + guest + '! Hadiah berhasil diklaim.');
+        } else {
+            showToast((r && (r.message || r.error)) || 'Klaim belum berhasil, coba lagi ya.');
+            loadGifts();                     // tampilkan keadaan terbaru (mis. sudah habis diklaim tamu lain)
+        }
+    }
+
+    // ===========================
     // PLAYLIST
     // ===========================
     async function loadPlaylist() {
